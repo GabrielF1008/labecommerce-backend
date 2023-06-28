@@ -1,8 +1,47 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.products = exports.users = void 0;
+exports.products = exports.users = exports.getAllUsers = exports.getAllProducts = exports.createUser = exports.createProduct = exports.searchProductsByName = void 0;
 let data = new Date();
 let newDate = new Date(data.valueOf() - data.getTimezoneOffset() * 60000);
+const searchProductsByName = (name) => {
+    const result = exports.products.filter((product) => {
+        return product.name.toLowerCase().includes(name.toLowerCase());
+    });
+    return result;
+};
+exports.searchProductsByName = searchProductsByName;
+const createProduct = (id, name, price, description, imageUrl) => {
+    const newProduct = {
+        id,
+        price,
+        name,
+        description,
+        imageUrl
+    };
+    exports.products.push(newProduct);
+    console.log("Produto adicionado com sucesso");
+};
+exports.createProduct = createProduct;
+const createUser = (id, name, email, password) => {
+    const newUser = {
+        id,
+        email,
+        name,
+        password,
+        createdAt: new Date().toISOString()
+    };
+    exports.users.push(newUser);
+    console.log("Cadastro realizado com sucesso");
+};
+exports.createUser = createUser;
+const getAllProducts = () => {
+    return exports.products;
+};
+exports.getAllProducts = getAllProducts;
+const getAllUsers = () => {
+    return exports.users;
+};
+exports.getAllUsers = getAllUsers;
 exports.users = [
     {
         id: "User01",
