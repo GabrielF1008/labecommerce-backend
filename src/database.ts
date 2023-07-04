@@ -59,7 +59,7 @@ export const createProduct = (id: string, name: string, price: number, descripti
     console.log("Produto adicionado com sucesso")
 }
 
-export const createUser = (id: string, name: string, email: string, password: string): void => {
+export const createUser = (id: string, name: string, email: string, password: string): string => {
     const newUser: TUsers = {
         id,
         email,
@@ -68,7 +68,7 @@ export const createUser = (id: string, name: string, email: string, password: st
         createdAt: new Date().toISOString()
     }
     users.push(newUser)
-    console.log("Cadastro realizado com sucesso")
+    return ("Cadastro realizado com sucesso")
 }
 
 export const getAllProducts = () : TProducts[] => {
