@@ -1,5 +1,6 @@
 import { users, products, createUser, getAllUsers, createProduct, getAllProducts, searchProductsByName } from "./database";
 
+
 // console.table(getAllUsers())
 // createUser("User03", "Fulano", "fulanodetal@gmail.com", "fulanodetal123")
 // console.table(getAllUsers())
@@ -11,7 +12,7 @@ import { users, products, createUser, getAllUsers, createProduct, getAllProducts
 
 import express, { Request, Response } from 'express'
 import cors from 'cors'
-import { TUsers } from "./types";
+import { TProducts, TUsers } from "./types";
 
 const app = express()
 
@@ -66,6 +67,7 @@ app.get('/products', (req: Request, res: Response) => {
             res.status(500)
         }
         res.send(error.message)
+
     }
 })
 
@@ -182,3 +184,52 @@ app.post('/products', (req: Request, res: Response) => {
         res.send(error.message)
     } 
 })
+
+//Delete User By Id
+app.delete('/users/:id', (req: Request, res: Response) => {
+    const userIdToDelete = req.params.id
+
+    const userIdIndex = users.findIndex((user) => user.id === userIdToDelete)
+
+    if(userIdIndex >= 0){
+        users.splice(userIdIndex, 1)
+    }
+
+    res.status(200).send("User apagado com sucesso")
+})
+
+// Delete Product By Id
+app.delete('/products/:id', (req: Request, res: Response) => {
+    const productToDelete = req.params.id
+    
+    const productIdIndex = products.findIndex((product) => product.id === productToDelete)
+
+    if(productIdIndex >= 0){
+        products.splice(productIdIndex, 1)
+    }
+
+    res.status(200).send("Produto apagado com sucesso")
+})
+
+// Edit Product by id
+app.put('/products/:id', (req: Request, res: Response) => {
+    const idToEdit = req.params.id
+
+    const newId = req.body.id as string
+    const newName = req.body.name as string
+    const newPrice = req.body.price as number
+    const newDescription = req.body.description as string
+    const newImageUrl = req.body.imageUrl as string
+
+    const product = products.find((product) => product.id === idToEdit)
+
+    if(product){
+        product.id = newId || product.id
+        product.name = newName || product.name
+        product.price = newPrice || product.price
+        product.description = newDescription || product.description
+        product.imageUrl = newImageUrl || product.imageUrl
+    }
+    res.status(200).send("Produto atualizado com sucesso")
+})
+
