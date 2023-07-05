@@ -1,4 +1,4 @@
-import { users, products, createUser, getAllUsers, createProduct, getAllProducts, searchProductsByName} from "./database";
+import { users, products, createUser, getAllUsers, createProduct, getAllProducts, searchProductsByName } from "./database";
 
 
 // console.table(getAllUsers())
@@ -19,7 +19,7 @@ import { users, products, createUser, getAllUsers, createProduct, getAllProducts
 
 import express, { Request, Response } from 'express'
 import cors from 'cors'
-import { TUsers } from "./types";
+import { TProducts, TUsers } from "./types";
 
 const app = express()
 
@@ -34,70 +34,38 @@ app.get('/ping', (req: Request, res: Response) => {
     res.send('Pong!')
 })
 
-// method HTTP (GET)
-// path ("/users")
-// response
-// status 200
-// array de users do database.ts
-
 // Get All Users
 app.get('/users', (req: Request, res: Response) => {
     res.status(200).send(users)
 })
 
 // Get All Products
-// Caso seja recebido um termo de busca no query params name, a resposta da API será a lista filtrada baseada no nome dos produtos. Caso a query params chegue undefined, continua sendo devolvida a lista de todos os produtos.
-// method HTTP (GET)
-// path ("/product")
-// query params
-// name
-// response
-// status 200
-// array do resultado da busca ou todos os produtos
-
 app.get('/products', (req: Request, res: Response) => {
-    const name = req.query.name as string
 
-    const result = products.filter(
-        (product) => product.name.toLowerCase().includes(name.toLowerCase())
-    )
-    // res.status(200).send(result)
-    result ? res.status(200).send(result) : res.status(200).send(products)
+    const nameToFind = req.query.name as string;
+
+    if (nameToFind) {
+        const result: TProducts[] = products.filter((product) => 
+            product.name.toLowerCase().includes(nameToFind.toLowerCase())
+        );
+        res.status(200).send(result)
+    } else {
+        res.status(200).send(products)
+    }
 })
 
 // Create User
-// method HTTP (POST)
-// path ("/users")
-// body
-// id
-// name
-// email
-// password
-// response
-// status 201
-// "Cadastro realizado com sucesso"
 app.post('/users', (req: Request, res: Response) => {
     const id = req.body.id as string
     const name = req.body.name as string
     const email = req.body.email as string
     const password = req.body.password as string
 
-    const result : string = createUser(id, name, email, password)
+    const result: string = createUser(id, name, email, password)
     res.status(201).send(result)
 })
 
 // Create Product
-// method HTTP (POST)
-// path ("/products")
-// body
-// id
-// name
-// price
-// description
-// imageUrl
-// response
-// status 201
-// "Produto cadastrado com sucesso"
 app.post('/products', (req: Request, res: Response) => {
     const id = req.body.id as string
     const name = req.body.name as string
@@ -117,3 +85,52 @@ app.post('/products', (req: Request, res: Response) => {
 
     res.status(201).send("Produto cadastrado com sucesso")
 })
+
+//Delete User By Id
+app.delete('/users/:id', (req: Request, res: Response) => {
+    const userIdToDelete = req.params.id
+
+    const userIdIndex = users.findIndex((user) => user.id === userIdToDelete)
+
+    if(userIdIndex >= 0){
+        users.splice(userIdIndex, 1)
+    }
+
+    res.status(200).send("User apagado com sucesso")
+})
+
+// Delete Product By Id
+app.delete('/products/:id', (req: Request, res: Response) => {
+    const productToDelete = req.params.id
+    
+    const productIdIndex = products.findIndex((product) => product.id === productToDelete)
+
+    if(productIdIndex >= 0){
+        products.splice(productIdIndex, 1)
+    }
+
+    res.status(200).send("Produto apagado com sucesso")
+})
+
+// Edit Product by id
+app.put('/products/:id', (req: Request, res: Response) => {
+    const idToEdit = req.params.id
+
+    const newId = req.body.id as string
+    const newName = req.body.name as string
+    const newPrice = req.body.price as number
+    const newDescription = req.body.description as string
+    const newImageUrl = req.body.imageUrl as string
+
+    const product = products.find((product) => product.id === idToEdit)
+
+    if(product){
+        product.id = newId || product.id
+        product.name = newName || product.name
+        product.price = newPrice || product.price
+        product.description = newDescription || product.description
+        product.imageUrl = newImageUrl || product.imageUrl
+    }
+    res.status(200).send("Produto atualizado com sucesso")
+})
+
