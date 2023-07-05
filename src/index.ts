@@ -1,20 +1,12 @@
-import { users, products, createUser, getAllUsers, createProduct, getAllProducts, searchProductsByName} from "./database";
-
+import { users, products, createUser, getAllUsers, createProduct, getAllProducts, searchProductsByName } from "./database";
 
 // console.table(getAllUsers())
-
 // createUser("User03", "Fulano", "fulanodetal@gmail.com", "fulanodetal123")
-
-
 // console.table(getAllUsers())
-
 // console.table(getAllProducts())
-
 // console.log("CREATEPRODUCT")
 // createProduct("prod003", "SSD gamer", 349.99, "Acelere seu sistema com velocidades incríveis de leitura e gravação.", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSb-f-YLiaX_2VdCQq3atkPdf2BYlexd289EPCugFlhUg&s")
-
 // console.table(getAllProducts())
-
 // console.table(searchProductsByName("gamer"))
 
 import express, { Request, Response } from 'express'
@@ -34,86 +26,159 @@ app.get('/ping', (req: Request, res: Response) => {
     res.send('Pong!')
 })
 
-// method HTTP (GET)
-// path ("/users")
-// response
-// status 200
-// array de users do database.ts
-
 // Get All Users
 app.get('/users', (req: Request, res: Response) => {
-    res.status(200).send(users)
+    try {
+        res.status(200).send(users)
+    } catch (error: any) {
+        console.log(error)
+
+        if (res.statusCode === 200) {
+            res.status(500)
+        }
+        res.send(error.message)
+    }
 })
 
 // Get All Products
-// Caso seja recebido um termo de busca no query params name, a resposta da API será a lista filtrada baseada no nome dos produtos. Caso a query params chegue undefined, continua sendo devolvida a lista de todos os produtos.
-// method HTTP (GET)
-// path ("/product")
-// query params
-// name
-// response
-// status 200
-// array do resultado da busca ou todos os produtos
-
 app.get('/products', (req: Request, res: Response) => {
-    const name = req.query.name as string
+    try {
+        const name = req.query.name as string
 
-    const result = products.filter(
-        (product) => product.name.toLowerCase().includes(name.toLowerCase())
-    )
-    // res.status(200).send(result)
-    result ? res.status(200).send(result) : res.status(200).send(products)
+        if (name == undefined) {
+            res.status(200).send(products)
+        }
+
+        if (name.length < 1) {
+            res.status(400)
+            throw new Error("Name precisa conter pelo menos um caractere")
+        }
+
+        const result = products.filter(
+            (product) => product.name.toLowerCase().includes(name.toLowerCase())
+        )
+        // res.status(200).send(result)
+        res.status(200).send(result)
+    } catch (error: any) {
+        console.log(error)
+
+        if (res.statusCode === 200) {
+            res.status(500)
+        }
+        res.send(error.message)
+    }
 })
 
 // Create User
-// method HTTP (POST)
-// path ("/users")
-// body
-// id
-// name
-// email
-// password
-// response
-// status 201
-// "Cadastro realizado com sucesso"
 app.post('/users', (req: Request, res: Response) => {
-    const id = req.body.id as string
-    const name = req.body.name as string
-    const email = req.body.email as string
-    const password = req.body.password as string
 
-    const result : string = createUser(id, name, email, password)
-    res.status(201).send(result)
+    try {
+        const id = req.body.id as string 
+        const name = req.body.name as string
+        const email = req.body.email as string
+        const password = req.body.password as string
+
+        const result: string = createUser(id, name, email, password)
+
+            if(typeof id !== "string"){
+                throw new Error("'id' deve ser uma string")
+            }
+            if (id.length < 1) {
+                throw new Error("'id' deve possuir no mínimo 1 caractere")
+            }
+
+            if(typeof name !== "string"){
+                throw new Error("'name' deve ser uma string")
+            }
+            if (name.length < 1) {
+                throw new Error("'name' deve possuir no mínimo 1 caractere")
+            }
+
+            if(typeof email !== "string"){
+                throw new Error("'email' deve ser uma string")
+            }
+            if (email.length < 1) {
+                throw new Error("'email' deve possuir no mínimo 1 caractere")
+            }
+
+            if(typeof password !== "string"){
+                throw new Error("'password' deve ser uma string")
+            }
+            if (password.length < 1) {
+                throw new Error("'password' deve possuir no mínimo 1 caractere")
+            }
+
+        res.status(201).send(result)
+    } catch (error: any) {
+        console.log(error)
+        if (res.statusCode === 200) {
+            res.status(500)
+        }
+        res.send(error.message)
+    } 
 })
 
 // Create Product
-// method HTTP (POST)
-// path ("/products")
-// body
-// id
-// name
-// price
-// description
-// imageUrl
-// response
-// status 201
-// "Produto cadastrado com sucesso"
 app.post('/products', (req: Request, res: Response) => {
-    const id = req.body.id as string
-    const name = req.body.name as string
-    const price = req.body.price as number
-    const description = req.body.description as string
-    const imageUrl = req.body.imageUrl as string
 
-    const newProduct = {
-        id,
-        name,
-        price,
-        description,
-        imageUrl
-    }
+    try {
+        const id = req.body.id as string
+        const name = req.body.name as string
+        const price = req.body.price as number
+        const description = req.body.description as string
+        const imageUrl = req.body.imageUrl as string
+    
+        const newProduct = {
+            id,
+            name,
+            price,
+            description,
+            imageUrl
+        }
+    
+        products.push(newProduct)
 
-    products.push(newProduct)
+        if(typeof id !== "string"){
+            throw new Error("'id' deve ser uma string")
+        }
+        if (id.length < 1) {
+            throw new Error("'id' deve possuir no mínimo 1 caractere")
+        }
 
-    res.status(201).send("Produto cadastrado com sucesso")
+        if(typeof name !== "string"){
+            throw new Error("'name' deve ser uma string")
+        }
+        if (name.length < 1) {
+            throw new Error("'name' deve possuir no mínimo 1 caractere")
+        }
+
+        if(typeof price !== "number"){
+            throw new Error("'price' deve ser um number")
+        }
+        if (price === undefined) {
+            throw new Error("'price' deve possuir no mínimo 1 caractere")
+        }
+
+        if(typeof description !== "string"){
+            throw new Error("'description' deve ser uma string")
+        }
+        if (description.length < 1) {
+            throw new Error("'description' deve possuir no mínimo 1 caractere")
+        }
+
+        if(typeof imageUrl !== "string"){
+            throw new Error("'imageUrl' deve ser uma string")
+        }
+        if (imageUrl.length < 1) {
+            throw new Error("'imageUrl' deve possuir no mínimo 1 caractere")
+        }
+    
+        res.status(201).send("Produto cadastrado com sucesso") 
+    } catch (error: any) {
+        console.log(error)
+        if (res.statusCode === 200) {
+            res.status(500)
+        }
+        res.send(error.message)
+    } 
 })
