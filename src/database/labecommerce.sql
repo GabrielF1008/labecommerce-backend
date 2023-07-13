@@ -86,3 +86,39 @@ VALUES (
         'fulaninho',
         'https://picsum.photos/id/800/200/300?grayscale&blur=2'
     );
+
+-- Get All Users
+SELECT * FROM users;
+
+-- Get All Products
+SELECT * FROM products;
+
+-- Get All Products onde name contém 'gamer'
+SELECT * FROM products
+    WHERE name like '%gamer%';
+
+-- Create User
+INSERT INTO users (id, name, email, password, created_at)
+    VALUES ('u004', 'Ciclano', 'ciclano9@gmail.com', '123123231', '12/07/2023');
+
+-- Create Product
+INSERT INTO products (id, name, price, description, image_url)
+    VALUES ('p004', 'Fone de ouvido', 79.90, 'Fone muito bom', 'blablabla');
+
+-- Delete User by id
+DELETE FROM users
+WHERE id = 'u001';
+
+-- Delete Product by id
+DELETE FROM products
+WHERE id = 'p001';
+
+-- Edit Product by id
+UPDATE products
+    SET id = 'produto002', 
+    name = 'OutraCoisa', 
+    price = 0.99, 
+    description = 'OutraParada', 
+    image_url = 'qualquerCoisa'
+    WHERE id = 'p002';
+
